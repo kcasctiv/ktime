@@ -9,11 +9,13 @@ import (
 )
 
 // Time is milliseconds in JSON, otherwise - time.Time
-type Time time.Time
+type Time struct {
+	time.Time
+}
 
 // GetBSON bson Getter interface implementation
 func (t Time) GetBSON() (interface{}, error) {
-	return time.Time(t), nil
+	return t.Time, nil
 }
 
 // SetBSON bson Setter interface implementation
@@ -24,7 +26,7 @@ func (t *Time) SetBSON(raw bson.Raw) error {
 		return err
 	}
 
-	*t = Time(tt)
+	*t = Time{tt}
 	return nil
 }
 
@@ -53,7 +55,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 
 // MS representation in milliseconds
 func (t Time) MS() int64 {
-	return time.Time(t).UnixNano() / 1000000
+	return t.UnixNano() / 1000000
 }
 
 // FromMS creates new Time with initial value,
@@ -61,5 +63,5 @@ func (t Time) MS() int64 {
 func FromMS(ms int64) Time {
 	sec := int64(ms / 1000)
 	nsec := int64(int64(ms)-sec*1000) * 1000000
-	return Time(time.Unix(sec, nsec))
+	return Time{time.Unix(sec, nsec)}
 }
